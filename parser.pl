@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Data::Dumper;
-
 use SQLite::DB;
 
 my %GSTAT;
@@ -14,7 +13,6 @@ my %LOG;
 while (<>) {
 	if (m/^# (\w+):\s+(\d+)/) {
 		$GSTAT{$1} = $2;
-		# print "$1 is $2\n";
 		next;
 	}
 	last if (m/contents/);
@@ -40,25 +38,16 @@ while (my $line = <>) {
 				$GSTAT{rev} = $1;
 			}
 			if ($line =~ m/^#\s+top\s+TEST .*FAILED \(([^)]+)\)/) {
-				print "Runtime $1\n";
 				$LOG{$test}{runtime} = $1;
 			}
 
 			if ($line =~ m/^FAIL/) {
-				print "Done with $test\n";
 				$LOG{$test}{log} = $log;
 				$log = "";
 				last;
 			}
 		}
-	} else {
-		# print "No fail: $line"
-	}
-}
-
-# print Dumper(\%GSTAT);
-# print Dumper(\%LOG);
-
+	} 
 
 my $db = SQLite::DB->new("stats.sqlite");
 $db->connect() or die($!);
